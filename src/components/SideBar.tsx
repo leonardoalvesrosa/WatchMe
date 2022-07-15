@@ -1,31 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 
 import { api } from '../services/api';
 import { Button } from '../components/Button';
 
 import '../styles/sidebar.scss';
-
-interface GenreResponseProps {
-  id: number;
-  name: 'action' | 'comedy' | 'documentary' | 'drama' | 'horror' | 'family';
-  title: string;
-}
+import { IGenre } from '../interfaces/Genre';
 
 interface SideBarProps {
-  handleClickButton: (id: number) => void;
+  genres: IGenre[];
   selectedGenreId: number;
+  buttonClickCallback: (args: number) => void;
 }
 
 
-export function SideBar({ handleClickButton, selectedGenreId }: SideBarProps) {
-
-  const [genres, setGenres] = useState<GenreResponseProps[]>([]);
-
-  useEffect(() => {
-    api.get<GenreResponseProps[]>('genres').then(response => {
-      setGenres(response.data);
-    });
-  }, []);
+export function SideBarComponent({
+  genres,
+  selectedGenreId,
+  buttonClickCallback
+}: SideBarProps) {
 
   return (
     <>
@@ -38,7 +30,7 @@ export function SideBar({ handleClickButton, selectedGenreId }: SideBarProps) {
               key={String(genre.id)}
               title={genre.title}
               iconName={genre.name}
-              onClick={() => handleClickButton(genre.id)}
+              onClick={() => buttonClickCallback(genre.id)}
               selected={selectedGenreId === genre.id}
             />
           ))}
@@ -48,3 +40,6 @@ export function SideBar({ handleClickButton, selectedGenreId }: SideBarProps) {
     </>
   )
 }
+
+
+export const SideBar = memo(SideBarComponent);

@@ -1,45 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 
 import { MovieCard } from '../components/MovieCard';
 
 import '../styles/content.scss';
 
-import { api } from '../services/api';
-
-
-interface MovieProps {
-  imdbID: string;
-  Title: string;
-  Poster: string;
-  Ratings: Array<{
-    Source: string;
-    Value: string;
-  }>;
-  Runtime: string;
-}
-
-interface GenreResponseProps {
-  id: number;
-  name: 'action' | 'comedy' | 'documentary' | 'drama' | 'horror' | 'family';
-  title: string;
-}
-
+import { IMovie } from '../interfaces/Movie';
+import { IGenre } from '../interfaces/Genre';
 
 interface ContentProps {
-  selectedGenreId: number;
-  selectedGenre: GenreResponseProps;
+  selectedGenre: IGenre;
+  movies: IMovie[];
 }
 
-export function Content({ selectedGenreId, selectedGenre }: ContentProps) {
-
-  const [movies, setMovies] = useState<MovieProps[]>([]);
-
-  useEffect(() => {
-    api.get<MovieProps[]>(`movies/?Genre_id=${selectedGenreId}`).then(response => {
-      setMovies(response.data);
-    });
-  }, [selectedGenreId]);
-
+export function ContentComponent({ selectedGenre, movies }: ContentProps) {
 
   return (
     <div className="container">
@@ -58,3 +31,7 @@ export function Content({ selectedGenreId, selectedGenre }: ContentProps) {
   )
 
 }
+
+export const Content = memo(ContentComponent, (prevProps, nextProps) => {
+  return Object.is(prevProps.movies, nextProps.movies)
+})
